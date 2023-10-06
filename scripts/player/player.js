@@ -24,7 +24,7 @@ export default function player(name = 'Player', type = 'human') {
     const board = gameboard();
     const navy = shipTypes.map((model) => ship(model.length, model.name));
 
-    function fireAttack(coordinates) {
+    function fireAttack(coordinates, board) {
         try {
             return board.receiveAttack(coordinates);
         } catch(err) {

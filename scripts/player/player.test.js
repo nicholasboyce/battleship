@@ -8,16 +8,20 @@ test('Player name is properly generated', () => {
 
 test('Fire attack is properly handling hits', () => {
     const playerOne = player("Yumi");
-    const cruiser = playerOne.navy[2];
-    playerOne.place(cruiser, [3, 0]);
-    expect(playerOne.fireAttack([3, 0])).toBe(true);
+    const playerTwo = player("Sissy");
+    const oppBoard = playerTwo.board;
+    const cruiser = playerTwo.navy[2];
+    playerTwo.place(cruiser, [3, 0]);
+    expect(playerOne.fireAttack([3, 0], oppBoard)).toBe(true);
 });
 
 test('Fire attack is properly handling hits', () => {
     const playerOne = player("Yumi");
-    const cruiser = playerOne.navy[2];
-    playerOne.place(cruiser, [3, 0]);
-    expect(playerOne.fireAttack([3, 2])).toBe(true);
+    const playerTwo = player("Sissy");
+    const oppBoard = playerTwo.board;
+    const cruiser = playerTwo.navy[2];
+    playerTwo.place(cruiser, [3, 0]);
+    expect(playerOne.fireAttack([3, 2], oppBoard)).toBe(true);
 });
 
 test('Fire attack is properly handling errors', () => {
