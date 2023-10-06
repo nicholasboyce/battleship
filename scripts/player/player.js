@@ -1,7 +1,7 @@
 import gameboard from "../gameboard/gameboard";
 import ship from "../ship/ship";
 
-export default function player(name = 'Player') {
+export default function player(name = 'Player', type = 'human') {
     const shipTypes = [
         {
             length: 5,
@@ -36,10 +36,14 @@ export default function player(name = 'Player') {
         }
     }
 
+    function getBoard() {
+        return board.getBoard();
+    }
+
     function place(ship, coordinates, orientation = 'x') {
         board.place(ship, coordinates, orientation);
     }
 
-    return { name, board, navy, place, fireAttack }
+    return { name, board, navy, place, fireAttack, type, getBoard }
 
 }
