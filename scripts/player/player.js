@@ -40,8 +40,8 @@ export default function player(name = 'Player', type = 'human') {
         return board.getBoard();
     }
 
-    function place(ship, coordinates, orientation = 'x') {
-        board.place(ship, coordinates, orientation);
+    function place(ship, coordinates, orientation) {
+        return board.place(ship, coordinates, orientation);
     }
 
     return { name, board, navy, place, fireAttack, type, getBoard }

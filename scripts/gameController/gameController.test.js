@@ -12,9 +12,13 @@ test('Switch current player function works correctly', () => {
     expect(game.getCurrPlayer().name).toBe("One");
 });
 
-test('Setup function works correctly', () => {
+test('Place function still works correctly', () => {
     const game = gameController();
-    game.setUp();
-    game.playRound([0, 0]);
-    expect(game.getCurrPlayer().name).toBe("Two");
+    const player = game.getCurrPlayer();
+    const carrier = player.navy[0];
+    const battleship = player.navy[1];
+
+    player.place(carrier, [0, 0], "Y");
+    player.place(battleship, [0, 1], "x");
+    expect(battleship.placed).toBe(true);
 });

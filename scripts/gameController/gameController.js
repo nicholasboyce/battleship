@@ -52,10 +52,10 @@ export default function gameController() {
         const navy = currPlayer.navy;
 
         for (const ship of navy) {
-            while (!ship.placed) {
+            while(!ship.placed) {
                 console.log(`Waiting for ${currPlayer.name} to place their ${ship.name}...`);
-                const xCoord = prompt('Please input target X coordinate. ');
-                const yCoord = prompt('Please input target Y coordinate. ');
+                const xCoord = Number(prompt('Please input target X coordinate. '));
+                const yCoord = Number(prompt('Please input target Y coordinate. '));
                 const coords = [xCoord, yCoord];
                 const orientation = prompt('Please input desired orientation. ');
                 currPlayer.place(ship, coords, orientation);
@@ -78,12 +78,12 @@ export default function gameController() {
         switchCurrPlayer();
     }
 
-    function main() {
-        setUp();
-        setUp();
-    }
+    // function main() {
+    //     setUp();
+    //     setUp();
+    // }
 
-    main();
+    // main();
 
     return {
         getCurrPlayer, 
@@ -93,4 +93,4 @@ export default function gameController() {
     }
 }
 
-gameController();
+// gameController();

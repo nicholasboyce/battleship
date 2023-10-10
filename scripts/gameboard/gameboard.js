@@ -25,7 +25,7 @@ export default function gameboard() {
     function place(ship, coordinates, orientation = 'x') {
         orientation = orientation.toLowerCase();
 
-        if (!isInvalidPlacement(ship, coordinates, orientation)) {
+        if (isValidPlacement(ship, coordinates, orientation)) {
             //Determine the orientation of the ship
             const rowCoord = coordinates[0];
             const colCoord = coordinates[1];
@@ -35,35 +35,50 @@ export default function gameboard() {
                 }
                 navy.push(ship);
                 ship.placed = true;
+                return true;
             } else {
                 for (let i = rowCoord; i < coordinates[0] + ship.length; i++) {
                     board[i][coordinates[1]] = ship;
                 }
                 navy.push(ship);
                 ship.placed = true;
+                return true;
             }   
+        } else {
+            return false;
         }
     }
 
     //only used for setting up board initially
-    function isInvalidPlacement(ship, coordinates, orientation = 'x') {
+    function isValidPlacement(ship, coordinates, orientation = 'x') {
         const rowCoord = coordinates[0];
         const colCoord = coordinates[1];
 
         if (orientation === 'x') {
-            for (let i = colCoord; i < coordinates[1] + ship.length; i++) {
-                if ( (board[coordinates[0]][i] !== 0) && (board[coordinates[0]][i] !== 1)) {
-                    return true; //If not 0 or 1, then it's ship.
+            for (let i = colCoord; i < colCoord + ship.length; i++) {
+                try {
+                    const target = board[rowCoord][i];
+                    if (target !== 0) {
+                        return false;
+                    }
+                } catch(err) {
+                    console.log(err);
+                    return false;
                 }
             }
         } else {
-            for (let i = rowCoord; i < coordinates[0] + ship.length; i++) {
-                if ((board[i][coordinates[1]] !== 0) && (board[i][coordinates[1]] !== 1)) {
-                    console.log(true);
-                    return true;
+            for (let i = rowCoord; i < rowCoord + ship.length; i++) {
+                try {
+                    const target = board[i][colCoord];
+                    if (target !== 0) {
+                        return false;
+                    }
+                } catch(err) {
+                    console.log(err);
+                    return false;
                 }
             }
-        } return false;
+        } return true;
     }
 
     function missed(coordinates) {
@@ -109,5 +124,5 @@ export default function gameboard() {
         return sunken >= navy.length;
     }
 
-    return { place, isInvalidPlacement, missed, getBoard, receiveAttack, allShipsSunk }
+    return { place, isValidPlacement, missed, getBoard, receiveAttack, allShipsSunk }
 }

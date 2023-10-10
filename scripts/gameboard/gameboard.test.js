@@ -1,17 +1,33 @@
-import gameboard from "./gameboard";
-import ship from "../ship/ship";
+import gameboard from "./gameboard.js";
+import ship from "../ship/ship.js";
 
 test('Check that ship is not at coordinate 0, 0', () => {
     const cruiser = ship();
     const board = gameboard();
-    expect(board.isInvalidPlacement(cruiser, [0, 0])).toBe(false);
+    expect(board.isValidPlacement(cruiser, [0, 0])).toBe(true);
 });
 
 test('Check that ship is at coordinate 0, 0', () => {
     const cruiser = ship();
     const board = gameboard();
     board.place(cruiser, [3, 7]);
-    expect(board.isInvalidPlacement(cruiser, [0, 0])).toBe(false);
+    expect(board.isValidPlacement(cruiser, [0, 0])).toBe(true);
+});
+
+test('Check that ship can be placed at coordinate 0, 1', () => {
+    const cruiser = ship(5);
+    const testShip = ship(4);
+    const board = gameboard();
+    board.place(cruiser, [0, 0], "Y");
+    expect(board.place(testShip, [0, 3], "X")).toBe(true);
+});
+
+test('Check that ship can\'t be placed at coordinate 0, 1', () => {
+    const cruiser = ship(5);
+    const testShip = ship(4);
+    const board = gameboard();
+    board.place(cruiser, [0, 0], "X");
+    expect(board.place(testShip, [0, 1], "X")).toBe(false);
 });
 
 test('Check that attack is not received successfully', () => {
