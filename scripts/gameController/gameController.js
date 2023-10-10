@@ -3,8 +3,6 @@ import promptSync from "prompt-sync";
 
 const prompt = promptSync();
 
-
-
 export default function gameController() {
     const playerOne = player("One");
     const playerTwo = player("Two");
@@ -97,14 +95,11 @@ export default function gameController() {
         }
     }
 
-    consolePlay();
-
     return {
         getCurrPlayer, 
         playRound, 
         getCurrBoard,
-        setUp
+        setUp,
+        consolePlay
     }
 }
-
-gameController();
