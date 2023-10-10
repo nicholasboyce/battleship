@@ -58,7 +58,7 @@ export default function gameboard() {
             }
         } else {
             for (let i = rowCoord; i < coordinates[0] + ship.length; i++) {
-                if ((board[i][coordinates[1]] !== 0) && (board[coordinates[0]][i] !== 1)) {
+                if ((board[i][coordinates[1]] !== 0) && (board[i][coordinates[1]] !== 1)) {
                     console.log(true);
                     return true;
                 }

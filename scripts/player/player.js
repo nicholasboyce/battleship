@@ -1,5 +1,5 @@
-import gameboard from "../gameboard/gameboard";
-import ship from "../ship/ship";
+import gameboard from "../gameboard/gameboard.js";
+import ship from "../ship/ship.js";
 
 export default function player(name = 'Player', type = 'human') {
     const shipTypes = [
