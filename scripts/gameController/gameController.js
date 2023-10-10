@@ -13,6 +13,8 @@ export default function gameController() {
     let currPlayer = players[0];
     let currPlayerIndex = 0;
 
+    let winner = null;
+
     function switchCurrPlayer() {
         currPlayer = currPlayer === players[0] ? players[1] : players[0];
         currPlayerIndex = (currPlayerIndex + 1) % 2;
@@ -29,11 +31,11 @@ export default function gameController() {
     function playRound(coordinates) {
         const otherPlayerIndex = (currPlayerIndex + 1) % 2;
         const otherPlayerBoard = players[otherPlayerIndex].board;
-        console.log(`It's ${currPlayer.name}'s turn.`);
         const result = currPlayer.fireAttack(coordinates, otherPlayerBoard);
         if (result !== null) { 
             if ( otherPlayerBoard.allShipsSunk() ) {
-                console.log("Game over!");
+                winner = currPlayer;
+                console.log(`Game over! ${winner.name} wins!`);
                 return null;
             } else {
                 switchCurrPlayer();
@@ -72,18 +74,30 @@ export default function gameController() {
         printBoard();
         placePrompt();
 
-
-
         //only do this once all ships have been placed
         switchCurrPlayer();
     }
 
-    // function main() {
-    //     setUp();
-    //     setUp();
-    // }
+    function consolePlay() {
+        setUp();
+        setUp();
+        while (winner === null) {
+            console.log(`It's ${currPlayer.name}'s turn.`);
+            let xCoord = prompt('Please input target X coordinate. ');
+            let yCoord = prompt('Please input target Y coordinate. ');
+            if ( xCoord === "q" || yCoord === "q") {
+                console.log("Quitting game...");
+                break;
+            } else {
+                xCoord = Number(xCoord);
+                yCoord = Number(yCoord);
+            }
+            const coords = [xCoord, yCoord];
+            playRound(coords);
+        }
+    }
 
-    // main();
+    consolePlay();
 
     return {
         getCurrPlayer, 
@@ -93,4 +107,4 @@ export default function gameController() {
     }
 }
 
-// gameController();
+gameController();
