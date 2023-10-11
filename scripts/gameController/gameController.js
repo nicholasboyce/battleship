@@ -9,11 +9,15 @@ export default function gameController() {
     const playerOne = player("One");
     const playerTwo = player("Two");
 
+    const playerOneGen = generator(playerOne.navy);
+    const playerTwoGen = generator(playerTwo.navy);
+
     const players = [playerOne, playerTwo];
     let currPlayer = players[0];
     let currPlayerIndex = 0;
 
     let winner = null;
+    let isGameMode = false;
 
     function switchCurrPlayer() {
         currPlayer = currPlayer === players[0] ? players[1] : players[0];
@@ -97,14 +101,28 @@ export default function gameController() {
         }
     }
 
-    consolePlay();
+    //Take out if working correctly in screenController
+    function boardClickHandler(e) {
+        if (!isGameMode) {
+            const currPlayerGen = currPlayer === playerOne ? playerOneGen : playerTwoGen;
+            let piece = currPlayerGen.next().value();
+            currPlayer.place(piece, [e.target.dataset.row, e.target.dataset.column], axis);
+            if (piece.placed) {
+                piece = currPlayerGen.next().value();
+            }
+            if (currPlayerGen.done) {
+                switchCurrPlayer();
+            }
+        } else {
+            playRound([e.target.dataset.row, e.target.dataset.column]);
+        } 
+    }
 
     return {
         getCurrPlayer, 
         playRound, 
         getCurrBoard,
-        setUp
+        setUp,
+        switchCurrPlayer
     }
 }
-
-gameController();
