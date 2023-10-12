@@ -98,6 +98,7 @@ export default function gameboard() {
             if (target.isSunk()) {
                 sunken = sunken + 1;
             } 
+            board[coordinates[0]][coordinates[1]] = 2;
             return true; 
         }
     }
