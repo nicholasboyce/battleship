@@ -1,8 +1,4 @@
 import player from "../player/player.js";
-import promptSync from "prompt-sync";
-
-const prompt = promptSync();
-
 
 
 export default function gameController() {
@@ -14,7 +10,6 @@ export default function gameController() {
     let currPlayerIndex = 0;
 
     let winner = null;
-    let isGameMode = false;
 
     function switchCurrPlayer() {
         currPlayer = currPlayer === players[0] ? players[1] : players[0];
@@ -52,64 +47,10 @@ export default function gameController() {
         return otherPlayer;
     }
 
-    function printBoard() {
-        const currBoard = currPlayer.getBoard();
-        console.table(currBoard);
-    }
-
-    function placePrompt() {
-        const navy = currPlayer.navy;
-
-        for (const ship of navy) {
-            while(!ship.placed) {
-                console.log(`Waiting for ${currPlayer.name} to place their ${ship.name}...`);
-                const xCoord = Number(prompt('Please input target X coordinate. '));
-                const yCoord = Number(prompt('Please input target Y coordinate. '));
-                const coords = [xCoord, yCoord];
-                const orientation = prompt('Please input desired orientation. ');
-                currPlayer.place(ship, coords, orientation);
-            }
-            printBoard();
-        }
-    }
-
-    function setUp() {
-        const name = prompt("What's your name? ");
-        currPlayer.name = name;
-        
-        //for current ship; only progress loop to next ship once current ship has been placed. break loop once all finished
-        printBoard();
-        placePrompt();
-
-        //only do this once all ships have been placed
-        switchCurrPlayer();
-    }
-
-    function consolePlay() {
-        setUp();
-        setUp();
-        while (winner === null) {
-            console.log(`It's ${currPlayer.name}'s turn.`);
-            let xCoord = prompt('Please input target X coordinate. ');
-            let yCoord = prompt('Please input target Y coordinate. ');
-            if ( xCoord === "q" || yCoord === "q") {
-                console.log("Quitting game...");
-                break;
-            } else {
-                xCoord = Number(xCoord);
-                yCoord = Number(yCoord);
-            }
-            const coords = [xCoord, yCoord];
-            playRound(coords);
-        }
-    }
-
-
     return {
         getCurrPlayer, 
         playRound, 
         getCurrBoard,
-        setUp,
         switchCurrPlayer,
         getOtherPlayer
     }

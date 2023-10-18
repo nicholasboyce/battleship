@@ -56,7 +56,6 @@ export default function screenController() {
             return;
         }
         if (!isGameMode) {
-            console.log(next.done);
             currPlayer.place(piece, coords, axis);
             if (piece.placed) {
                 next = currPlayerGen.next(); 
