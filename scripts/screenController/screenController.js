@@ -44,6 +44,7 @@ export default function screenController() {
     
     function updateScreen() {
         currPlayer = game.getCurrPlayer();
+        otherPlayer = game.getOtherPlayer();
         playerTurnDiv.textContent = isGameMode ? `It's ${currPlayer.name}'s turn!` : `Player ${currPlayer.name}, please place your ${piece.name}.`;
         renderBoard(currPlayer.getBoard());
         renderBoard(otherPlayer.getBoard());
@@ -56,14 +57,12 @@ export default function screenController() {
             return;
         }
         if (!isGameMode) {
-            currPlayer.place(piece, coords, axis);
-            if (piece.placed) {
-                next = currPlayerGen.next(); 
-                piece = next.value;
-                if (!next.done) {
-                    updateScreen();
-                }
+            const success = currPlayer.place(piece, coords, axis);
+            if (!success) {
+                return;
             }
+            next = currPlayerGen.next(); 
+            piece = next.value;
             if (next.done) {
                 game.switchCurrPlayer();
                 currPlayerGen = generator(game.getCurrPlayer().navy);
@@ -92,6 +91,7 @@ export default function screenController() {
                     cellButton.style.backgroundColor = 'green';
                 };
                 if (cell === 2) cellButton.style.backgroundColor = 'pink';
+                if (cell === 1) cellButton.style.backgroundColor = 'lightblue';
                 boardDiv.appendChild(cellButton);
             })
         });
