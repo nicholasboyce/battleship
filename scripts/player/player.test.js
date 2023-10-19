@@ -30,3 +30,11 @@ test('Fire attack is properly handling errors', () => {
     playerOne.place(cruiser, [3, 0]);
     expect(playerOne.fireAttack([8, 0])).toBe(null);
 });
+
+test('Player can access board objectAt correctly', () => {
+    const playerOne = player("Yumi");
+    const cruiser = playerOne.navy[2];
+    playerOne.place(cruiser, [3, 0]);
+    const target = playerOne.objectAt([3, 0]);
+    expect(target.name).toBe("Cruiser");
+});

@@ -35,7 +35,7 @@ export default function gameController() {
                 return null;
             } else {
                 switchCurrPlayer();
-                return true;
+                return result;
             }
         };
         

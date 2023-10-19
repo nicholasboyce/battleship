@@ -14,6 +14,14 @@ test('Check that ship is at coordinate 0, 0', () => {
     expect(board.isValidPlacement(cruiser, [0, 0])).toBe(true);
 });
 
+test('Check that ship is at coordinate 0, 0', () => {
+    const cruiser = ship(1, "Cruiser");
+    const board = gameboard();
+    board.place(cruiser, [0, 0]);
+    const target = board.objectAt([0, 0]);
+    expect(target.name).toBe("Cruiser");
+});
+
 test('Check that ship can be placed at coordinate 0, 1', () => {
     const cruiser = ship(5);
     const testShip = ship(4);

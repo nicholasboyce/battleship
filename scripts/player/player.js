@@ -23,6 +23,7 @@ export default function player(name = 'Player', type = 'human') {
 
     const board = gameboard();
     const navy = shipTypes.map((model) => ship(model.length, model.name));
+    
 
     function fireAttack(coordinates, board) {
         try {
@@ -44,6 +45,10 @@ export default function player(name = 'Player', type = 'human') {
         return board.place(ship, coordinates, orientation);
     }
 
-    return { name, board, navy, place, fireAttack, type, getBoard }
+    function objectAt(coords) {
+        return board.objectAt(coords);
+    }
+
+    return { name, board, navy, place, fireAttack, type, getBoard, objectAt }
 
 }

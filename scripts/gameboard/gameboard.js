@@ -125,5 +125,9 @@ export default function gameboard() {
         return sunken >= navy.length;
     }
 
-    return { place, isValidPlacement, missed, getBoard, receiveAttack, allShipsSunk }
+    function objectAt(coords) {
+        return board[coords[0]][coords[1]];
+    }
+
+    return { place, isValidPlacement, missed, getBoard, receiveAttack, allShipsSunk, objectAt }
 }

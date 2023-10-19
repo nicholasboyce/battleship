@@ -5,16 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
+    <script type="module" src="/main.js" defer></script>
   </head>
   <body>
     <div id="app">
-      <h1 class="turn"></h1>
-      <h2 class="axis-button">Axis: <span class="axis">X</span></h2>
+      <div class="text-items">
+        <h1 class="logo">BATTLESHIP</h1>
+        <h1 class="turn"></h1>
+        <button class="axis-button">Axis: <span class="axis">X</span></button>
+      </div>
       <div class="boards">
-        <div class="player-board board"></div>
-        <div class="opponent-board board"></div>
+        <div class="board-text friendly"><h2>FRIENDLY WATERS</h2><div class="player-board board"></div></div>
+        <div class="board-text enemy"><h2>ENEMY WATERS</h2><div class="opponent-board board"></div></div>
       </div>
     </div>
-    <script type="module" src="/main.js"></script>
   </body>
 </html>

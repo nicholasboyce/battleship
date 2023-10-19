@@ -16,6 +16,8 @@ export default function screenController() {
     const oppBoardDiv = document.querySelector('.opponent-board');
     const orientation = document.querySelector('.axis');
     const axisButton = document.querySelector('.axis-button');
+    const enemyBoard = document.querySelector('.enemy');
+
     let axis;
 
     axisButton.addEventListener("click", changeAxis);
@@ -39,6 +41,8 @@ export default function screenController() {
         isGameMode = true;
         playerBoardDiv.removeEventListener("click", boardClickHandler);
         oppBoardDiv.addEventListener("click", boardClickHandler);
+        axisButton.style.display = "none";
+        enemyBoard.style.display = "block";
         return isGameMode;
     }
     
@@ -52,7 +56,7 @@ export default function screenController() {
 
     function boardClickHandler(e) {
         const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
-        console.log(coords);
+        // console.log(coords);
         if (Number.isNaN(coords[0]) || Number.isNaN(coords[1])) {
             return;
         }
@@ -63,16 +67,31 @@ export default function screenController() {
             }
             next = currPlayerGen.next(); 
             piece = next.value;
+            renderBoard(currPlayer.getBoard());
             if (next.done) {
-                game.switchCurrPlayer();
-                currPlayerGen = generator(game.getCurrPlayer().navy);
-                piece = currPlayerGen.next().value;
-                setUpCount++;
-                if ( setUpCount > 1 ) setGameModeTrue();
+                playerTurnDiv.textContent = "Switching...";
+                setTimeout(() => {
+                    game.switchCurrPlayer();
+                    currPlayerGen = generator(game.getCurrPlayer().navy);
+                    piece = currPlayerGen.next().value;
+                    setUpCount++;
+                    if ( setUpCount > 1 ) setGameModeTrue();
+                    updateScreen();
+                }, 1000);
+            } else {
+                playerTurnDiv.textContent = `Player ${currPlayer.name}, please place your ${piece.name}.`;
             }
         } else {
-            game.playRound(coords);
-        } updateScreen();
+            const target = otherPlayer.objectAt(coords);
+            const landed = game.playRound(coords);
+            if (landed !== null) {
+                playerTurnDiv.textContent = landed ? `...It's a hit on ${otherPlayer.name}'s ${target.name}!` : `...It's a miss!`;
+            } else {
+                playerTurnDiv.textContent = `Game over! ${currPlayer.name} wins!`;
+            }
+            renderBoard(otherPlayer.getBoard());
+            setTimeout(() => updateScreen(), 1000);
+        } 
     }
 
     function renderBoard(board) {
@@ -97,8 +116,12 @@ export default function screenController() {
         });
     }
 
-    console.log(game.getCurrPlayer().navy);
+    // console.log(game.getCurrPlayer().navy);
     playerBoardDiv.addEventListener("click", boardClickHandler);
+    currPlayer.name = prompt("Player One's Name? ");
+    otherPlayer.name = prompt("Player Two's Name? ");
     
-    updateScreen();
+    enemyBoard.style.display = "none";
+    playerTurnDiv.textContent = `Player ${currPlayer.name}, please place your ${piece.name}.`;
+    renderBoard(currPlayer.getBoard());
 }
