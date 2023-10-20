@@ -17,6 +17,7 @@ export default function screenController() {
     const orientation = document.querySelector('.axis');
     const axisButton = document.querySelector('.axis-button');
     const enemyBoard = document.querySelector('.enemy');
+    const sunk = document.querySelector('.sunk');
 
     let axis;
 
@@ -49,10 +50,13 @@ export default function screenController() {
     function updateScreen() {
         currPlayer = game.getCurrPlayer();
         otherPlayer = game.getOtherPlayer();
+        sunk.textContent = '';
         playerTurnDiv.textContent = isGameMode ? `It's ${currPlayer.name}'s turn!` : `Player ${currPlayer.name}, please place your ${piece.name}.`;
         renderBoard(currPlayer.getBoard());
         renderBoard(otherPlayer.getBoard());
     }
+
+    /* || Contained functions are used for dual-player mode ||*/
 
     function boardClickHandler(e) {
         const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
@@ -61,10 +65,17 @@ export default function screenController() {
             return;
         }
         if (!isGameMode) {
-            const success = currPlayer.place(piece, coords, axis);
-            if (!success) {
-                return;
-            }
+            placeShipHandler(coords);
+        } else {
+            attackHandler(coords);
+            renderBoard(otherPlayer.getBoard());
+            setTimeout(() => updateScreen(), 1500);
+        } 
+    }
+
+    function placeShipHandler(coords) {
+        const success = currPlayer.place(piece, coords, axis);
+        if (success) {
             next = currPlayerGen.next(); 
             piece = next.value;
             renderBoard(currPlayer.getBoard());
@@ -72,6 +83,7 @@ export default function screenController() {
                 playerTurnDiv.textContent = "Switching...";
                 setTimeout(() => {
                     game.switchCurrPlayer();
+                    //if player is human, use generator, otherwise AIplace function
                     currPlayerGen = generator(game.getCurrPlayer().navy);
                     piece = currPlayerGen.next().value;
                     setUpCount++;
@@ -81,19 +93,25 @@ export default function screenController() {
             } else {
                 playerTurnDiv.textContent = `Player ${currPlayer.name}, please place your ${piece.name}.`;
             }
-        } else {
-            const target = otherPlayer.objectAt(coords);
-            const landed = game.playRound(coords);
-            if (landed !== null) {
-                playerTurnDiv.textContent = landed ? `...It's a hit on ${otherPlayer.name}'s ${target.name}!` : `...It's a miss!`;
-            } else {
-                playerTurnDiv.textContent = `Game over! ${currPlayer.name} wins!`;
-            }
-            renderBoard(otherPlayer.getBoard());
-            setTimeout(() => updateScreen(), 1000);
-        } 
+        }
     }
 
+    function attackHandler(coords) {
+        const target = otherPlayer.objectAt(coords);
+        const landed = game.playRound(coords);
+        if (landed !== null) {
+            playerTurnDiv.textContent = landed ? `...It's a hit on ${otherPlayer.name}'s ${target.name}!` : `...It's a miss!`;
+            if (landed && target.isSunk()) {
+                sunk.textContent = `${otherPlayer.name}'s ${target.name} was sunk!`;
+            } 
+        } else {
+            playerTurnDiv.textContent = `Game over! ${currPlayer.name} wins!`;
+        }
+    }
+
+    /* || Contained functions are used for dual-player mode ||*/
+
+    
     function renderBoard(board) {
 
         const boardDiv = board === currPlayer.getBoard() ? playerBoardDiv : oppBoardDiv;

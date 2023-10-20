@@ -49,6 +49,31 @@ export default function player(name = 'Player', type = 'human') {
         return board.objectAt(coords);
     }
 
-    return { name, board, navy, place, fireAttack, type, getBoard, objectAt }
+    function computerPlace() {
+        if (this.type !== "human") {
+            for (const ship of navy) {
+                while (!ship.placed) {
+                    const coords =  generateRandomCoords();
+                    const axis = generateRandomAxis();
+                    board.place(ship, coords, axis);
+                }
+            }
+            return true;
+        }
+    }
+
+    function generateRandomAxis() {
+        const num = Math.floor(Math.random * 2);
+        if (num < 1) return 'X';
+        return 'Y';
+    }
+
+    function generateRandomCoords() {
+        const row = Math.floor(Math.random * 9);
+        const col = Math.floor(Math.random * 9);
+        return [row, col];
+    }
+
+    return { name, board, navy, place, fireAttack, type, getBoard, objectAt, computerPlace }
 
 }

@@ -38,3 +38,16 @@ test('Player can access board objectAt correctly', () => {
     const target = playerOne.objectAt([3, 0]);
     expect(target.name).toBe("Cruiser");
 });
+
+test('Computer AI can accurately place pieces autonomously', () => {
+    const playerOne = player("Yumi");
+    playerOne.type = "computer";
+    expect(playerOne.computerPlace()).toBe(true);
+});
+
+test('Computer AI has accurately placed pieces autonomously', () => {
+    const playerOne = player("Yumi");
+    playerOne.type = "computer";
+    playerOne.computerPlace();
+    expect(playerOne.navy[4].placed).toBe(true);
+});
