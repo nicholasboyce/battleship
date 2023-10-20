@@ -2,7 +2,11 @@ import gameController from "../gameController/gameController.js";
 
 
 export default function screenController() {
-    const game = gameController();
+    
+    let singlePlayerMode = true;
+
+
+    const game = gameController(singlePlayerMode);
     let setUpCount = 0;
     let isGameMode = false;
     let currPlayer = game.getCurrPlayer();
@@ -11,6 +15,8 @@ export default function screenController() {
     let next = currPlayerGen.next();
     let piece = next.value;
 
+    currPlayer.name = prompt("Player One's Name? ");
+
     const playerTurnDiv = document.querySelector('.turn');
     const playerBoardDiv = document.querySelector('.player-board');
     const oppBoardDiv = document.querySelector('.opponent-board');
@@ -18,6 +24,14 @@ export default function screenController() {
     const axisButton = document.querySelector('.axis-button');
     const enemyBoard = document.querySelector('.enemy');
     const sunk = document.querySelector('.sunk');
+
+    if (singlePlayerMode) {
+        //set up player board to handle click
+        playerBoardDiv.addEventListener("click", singlePlayerClickHandler);
+    } else {
+        playerBoardDiv.addEventListener("click", dualPlayerClickHandler);
+        otherPlayer.name = prompt("Player Two's Name? ");
+    }
 
     let axis;
 
@@ -40,8 +54,8 @@ export default function screenController() {
 
     function setGameModeTrue() {
         isGameMode = true;
-        playerBoardDiv.removeEventListener("click", boardClickHandler);
-        oppBoardDiv.addEventListener("click", boardClickHandler);
+        singlePlayerMode ? playerBoardDiv.removeEventListener("click", singlePlayerClickHandler) : playerBoardDiv.removeEventListener("click", dualPlayerClickHandler);
+        singlePlayerMode ? oppBoardDiv.addEventListener("click", singlePlayerClickHandler) : oppBoardDiv.addEventListener("click", dualPlayerClickHandler);
         axisButton.style.display = "none";
         enemyBoard.style.display = "block";
         return isGameMode;
@@ -51,14 +65,14 @@ export default function screenController() {
         currPlayer = game.getCurrPlayer();
         otherPlayer = game.getOtherPlayer();
         sunk.textContent = '';
-        playerTurnDiv.textContent = isGameMode ? `It's ${currPlayer.name}'s turn!` : `Player ${currPlayer.name}, please place your ${piece.name}.`;
+        playerTurnDiv.textContent = `It's ${currPlayer.name}'s turn!`;
         renderBoard(currPlayer.getBoard());
         renderBoard(otherPlayer.getBoard());
     }
 
     /* || Contained functions are used for dual-player mode ||*/
 
-    function boardClickHandler(e) {
+    function dualPlayerClickHandler(e) {
         const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
         // console.log(coords);
         if (Number.isNaN(coords[0]) || Number.isNaN(coords[1])) {
@@ -84,17 +98,29 @@ export default function screenController() {
                 setTimeout(() => {
                     game.switchCurrPlayer();
                     //if player is human, use generator, otherwise AIplace function
-                    currPlayerGen = generator(game.getCurrPlayer().navy);
-                    piece = currPlayerGen.next().value;
-                    setUpCount++;
-                    if ( setUpCount > 1 ) setGameModeTrue();
-                    updateScreen();
+                    if(singlePlayerMode) {
+                        game.getCurrPlayer().computerPlace();
+                        setGameModeTrue();
+                    } else {
+                        nextHumanPlayerPlace();
+                    }
+                    game.switchCurrPlayer();
+                    updateScreen(); 
                 }, 1000);
             } else {
                 playerTurnDiv.textContent = `Player ${currPlayer.name}, please place your ${piece.name}.`;
             }
         }
     }
+
+    function nextHumanPlayerPlace() {
+        currPlayerGen = generator(game.getCurrPlayer().navy);
+        piece = currPlayerGen.next().value;
+        setUpCount++;
+        if ( setUpCount > 1 ) setGameModeTrue();
+    }
+
+    /* || Contained functions are used for dual-player mode ||*/
 
     function attackHandler(coords) {
         const target = otherPlayer.objectAt(coords);
@@ -109,9 +135,38 @@ export default function screenController() {
         }
     }
 
-    /* || Contained functions are used for dual-player mode ||*/
+    function singlePlayerClickHandler(e) {
+        const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
+        if (!Number.isNaN(coords[0]) && !Number.isNaN(coords[1])) {
+            if (isGameMode) {
+                attackHandler(coords);
+                renderBoard(otherPlayer.getBoard());
+                computerAttack();
+            } else {
+                placeShipHandler(coords);
+            }
+        }
+    }
 
-    
+    function syncScreenAndGame() {
+        currPlayer = game.getCurrPlayer();
+        otherPlayer = game.getOtherPlayer();
+    }
+
+    function computerAttack() {
+        syncScreenAndGame();
+
+        const row = Math.floor(Math.random * 9);
+        const col = Math.floor(Math.random * 9);
+
+        console.log([row, col]);
+
+        attackHandler([row, col]);
+        syncScreenAndGame();
+        renderBoard(currPlayer.getBoard());
+    }
+
+
     function renderBoard(board) {
 
         const boardDiv = board === currPlayer.getBoard() ? playerBoardDiv : oppBoardDiv;
@@ -133,11 +188,6 @@ export default function screenController() {
             })
         });
     }
-
-    // console.log(game.getCurrPlayer().navy);
-    playerBoardDiv.addEventListener("click", boardClickHandler);
-    currPlayer.name = prompt("Player One's Name? ");
-    otherPlayer.name = prompt("Player Two's Name? ");
     
     enemyBoard.style.display = "none";
     playerTurnDiv.textContent = `Player ${currPlayer.name}, please place your ${piece.name}.`;

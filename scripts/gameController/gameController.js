@@ -1,9 +1,14 @@
 import player from "../player/player.js";
 
 
-export default function gameController() {
+export default function gameController(singlePlayerMode = true) {
     const playerOne = player("One");
     const playerTwo = player("Two");
+
+    if (singlePlayerMode) {
+        playerTwo.type = "computer";
+    }
+    
 
     const players = [playerOne, playerTwo];
     let currPlayer = players[0];
