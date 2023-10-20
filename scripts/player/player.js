@@ -63,14 +63,14 @@ export default function player(name = 'Player', type = 'human') {
     }
 
     function generateRandomAxis() {
-        const num = Math.floor(Math.random * 2);
+        const num = Math.floor(Math.random() * 2);
         if (num < 1) return 'X';
         return 'Y';
     }
 
     function generateRandomCoords() {
-        const row = Math.floor(Math.random * 9);
-        const col = Math.floor(Math.random * 9);
+        const row = Math.floor(Math.random() * 9);
+        const col = Math.floor(Math.random() * 9);
         return [row, col];
     }
 

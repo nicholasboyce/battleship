@@ -7,6 +7,7 @@ export default function gameController(singlePlayerMode = true) {
 
     if (singlePlayerMode) {
         playerTwo.type = "computer";
+        playerTwo.computerPlace();
     }
     
 

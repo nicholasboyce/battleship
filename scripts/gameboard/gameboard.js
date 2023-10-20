@@ -54,6 +54,8 @@ export default function gameboard() {
         const rowCoord = coordinates[0];
         const colCoord = coordinates[1];
 
+        if (Number.isNaN(rowCoord) || Number.isNaN(colCoord)) return false;
+
         if (orientation === 'x') {
             for (let i = colCoord; i < colCoord + ship.length; i++) {
                 try {

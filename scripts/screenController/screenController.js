@@ -4,7 +4,8 @@ import gameController from "../gameController/gameController.js";
 export default function screenController() {
     
     let singlePlayerMode = true;
-
+    const desiredMode = prompt("Would you like to play against the computer? Answer 'Yes' if so.");
+    singlePlayerMode = desiredMode.toLocaleLowerCase() === "yes";
 
     const game = gameController(singlePlayerMode);
     let setUpCount = 0;
@@ -33,6 +34,8 @@ export default function screenController() {
         otherPlayer.name = prompt("Player Two's Name? ");
     }
 
+    /** || Axis Selection */
+
     let axis;
 
     axisButton.addEventListener("click", changeAxis);
@@ -45,6 +48,8 @@ export default function screenController() {
             axis = orientation.textContent = 'X';
         }
     }
+
+    /** || */
 
     function* generator(array) {
         for (let i = 0; i < array.length; i+= 1) {
@@ -61,13 +66,65 @@ export default function screenController() {
         return isGameMode;
     }
     
-    function updateScreen() {
+    function syncScreenAndGame() {
         currPlayer = game.getCurrPlayer();
         otherPlayer = game.getOtherPlayer();
+    }
+
+    function renderBoard(board) {
+        const boardDiv = board === currPlayer.getBoard() ? playerBoardDiv : oppBoardDiv;
+        boardDiv.textContent = "";
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, colIndex) => {
+                const cellButton = document.createElement('button');
+                cellButton.classList.add('cell');
+
+                cellButton.dataset.row = rowIndex;
+                cellButton.dataset.column = colIndex;
+
+                if (cell instanceof Object && (board === currPlayer.getBoard())) {
+                    cellButton.style.backgroundColor = 'green';
+                };
+                if (cell === 2) cellButton.style.backgroundColor = 'pink';
+                if (cell === 1) cellButton.style.backgroundColor = 'lightblue';
+                boardDiv.appendChild(cellButton);
+            })
+        });
+    }
+
+
+    function updateScreen() {
+        syncScreenAndGame();
         sunk.textContent = '';
         playerTurnDiv.textContent = `It's ${currPlayer.name}'s turn!`;
         renderBoard(currPlayer.getBoard());
         renderBoard(otherPlayer.getBoard());
+    }
+
+    function computerAttack() {
+        syncScreenAndGame();
+
+        const row = Math.floor(Math.random() * 9);
+        const col = Math.floor(Math.random() * 9);
+
+        console.log([row, col]);
+
+        attackHandler([row, col]);
+        syncScreenAndGame();
+        renderBoard(currPlayer.getBoard());
+    }
+
+    function singlePlayerClickHandler(e) {
+        const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
+        if (!Number.isNaN(coords[0]) && !Number.isNaN(coords[1])) {
+            if (isGameMode) {
+                attackHandler(coords);
+                renderBoard(otherPlayer.getBoard());
+                computerAttack();
+            } else {
+                placeShipHandler(coords);
+            }
+        }
     }
 
     /* || Contained functions are used for dual-player mode ||*/
@@ -75,16 +132,15 @@ export default function screenController() {
     function dualPlayerClickHandler(e) {
         const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
         // console.log(coords);
-        if (Number.isNaN(coords[0]) || Number.isNaN(coords[1])) {
-            return;
+        if (!Number.isNaN(coords[0]) && !Number.isNaN(coords[1])) {
+            if (isGameMode) {
+                attackHandler(coords);
+                renderBoard(otherPlayer.getBoard());
+                setTimeout(() => updateScreen(), 1500);
+            } else {
+                placeShipHandler(coords);
+            }
         }
-        if (!isGameMode) {
-            placeShipHandler(coords);
-        } else {
-            attackHandler(coords);
-            renderBoard(otherPlayer.getBoard());
-            setTimeout(() => updateScreen(), 1500);
-        } 
     }
 
     function placeShipHandler(coords) {
@@ -133,60 +189,6 @@ export default function screenController() {
         } else {
             playerTurnDiv.textContent = `Game over! ${currPlayer.name} wins!`;
         }
-    }
-
-    function singlePlayerClickHandler(e) {
-        const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
-        if (!Number.isNaN(coords[0]) && !Number.isNaN(coords[1])) {
-            if (isGameMode) {
-                attackHandler(coords);
-                renderBoard(otherPlayer.getBoard());
-                computerAttack();
-            } else {
-                placeShipHandler(coords);
-            }
-        }
-    }
-
-    function syncScreenAndGame() {
-        currPlayer = game.getCurrPlayer();
-        otherPlayer = game.getOtherPlayer();
-    }
-
-    function computerAttack() {
-        syncScreenAndGame();
-
-        const row = Math.floor(Math.random * 9);
-        const col = Math.floor(Math.random * 9);
-
-        console.log([row, col]);
-
-        attackHandler([row, col]);
-        syncScreenAndGame();
-        renderBoard(currPlayer.getBoard());
-    }
-
-
-    function renderBoard(board) {
-
-        const boardDiv = board === currPlayer.getBoard() ? playerBoardDiv : oppBoardDiv;
-        boardDiv.textContent = "";
-        board.forEach((row, rowIndex) => {
-            row.forEach((cell, colIndex) => {
-                const cellButton = document.createElement('button');
-                cellButton.classList.add('cell');
-
-                cellButton.dataset.row = rowIndex;
-                cellButton.dataset.column = colIndex;
-
-                if (cell instanceof Object && (board === currPlayer.getBoard())) {
-                    cellButton.style.backgroundColor = 'green';
-                };
-                if (cell === 2) cellButton.style.backgroundColor = 'pink';
-                if (cell === 1) cellButton.style.backgroundColor = 'lightblue';
-                boardDiv.appendChild(cellButton);
-            })
-        });
     }
     
     enemyBoard.style.display = "none";

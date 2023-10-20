@@ -7,7 +7,7 @@ test('Get current player function works correctly', () => {
 });
 
 test('Switch current player function works correctly', () => {
-    const game = gameController();
+    const game = gameController(false);
     game.playRound([0, 0]);
     expect(game.getCurrPlayer().name).toBe("One");
 });
@@ -21,4 +21,10 @@ test('Place function still works correctly', () => {
     player.place(carrier, [0, 0], "Y");
     player.place(battleship, [0, 1], "x");
     expect(battleship.placed).toBe(true);
+});
+
+test('Get current player function works correctly', () => {
+    const game = gameController();
+    const cpu = game.getOtherPlayer();
+    console.table(cpu.getBoard());
 });
