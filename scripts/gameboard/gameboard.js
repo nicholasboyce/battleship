@@ -64,7 +64,7 @@ export default function gameboard() {
                         return false;
                     }
                 } catch(err) {
-                    console.log(err);
+                    // console.log(err);
                     return false;
                 }
             }
@@ -76,7 +76,7 @@ export default function gameboard() {
                         return false;
                     }
                 } catch(err) {
-                    console.log(err);
+                    // console.log(err);
                     return false;
                 }
             }
@@ -128,6 +128,7 @@ export default function gameboard() {
     }
 
     function objectAt(coords) {
+        if (board[coords[0]][coords[1]] === undefined) return undefined;
         return board[coords[0]][coords[1]];
     }
 

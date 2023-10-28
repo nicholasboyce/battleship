@@ -53,7 +53,8 @@ export default function player(name = 'Player', type = 'human') {
         if (this.type !== "human") {
             for (const ship of navy) {
                 while (!ship.placed) {
-                    const coords =  generateRandomCoords();
+                    let coords =  generateRandomCoords();
+                    while (objectAt(coords) === undefined) coords = generateRandomCoords();
                     const axis = generateRandomAxis();
                     board.place(ship, coords, axis);
                 }
@@ -69,11 +70,13 @@ export default function player(name = 'Player', type = 'human') {
     }
 
     function generateRandomCoords() {
-        const row = Math.floor(Math.random() * 9);
-        const col = Math.floor(Math.random() * 9);
+        const row = Math.floor(Math.random() * 8);
+        const col = Math.floor(Math.random() * 8);
         return [row, col];
     }
 
-    return { name, board, navy, place, fireAttack, type, getBoard, objectAt, computerPlace }
+    const shotsFired = new Set([]);
+
+    return { name, board, navy, place, fireAttack, type, getBoard, objectAt, computerPlace, shotsFired }
 
 }

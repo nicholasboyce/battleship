@@ -15,6 +15,9 @@ export default function screenController() {
     let currPlayerGen = generator(currPlayer.navy);
     let next = currPlayerGen.next();
     let piece = next.value;
+    let isWinner = false;
+    const playerOneShots = new Set([]);
+    const playerTwoShots = new Set([]);
 
     currPlayer.name = prompt("Player One's Name? ");
 
@@ -96,18 +99,40 @@ export default function screenController() {
     function updateScreen() {
         syncScreenAndGame();
         sunk.textContent = '';
-        playerTurnDiv.textContent = `It's ${currPlayer.name}'s turn!`;
+        if (!isWinner) playerTurnDiv.textContent = `It's ${currPlayer.name}'s turn!`;
         renderBoard(currPlayer.getBoard());
         renderBoard(otherPlayer.getBoard());
+    }
+
+    function attackHandler(coords) {
+        const target = otherPlayer.objectAt(coords);
+        if (target === undefined) return;
+        const landed = game.playRound(coords);
+        if (landed !== null) {
+            playerTurnDiv.textContent = landed ? `...It's a hit on ${otherPlayer.name}'s ${target.name}!` : `...It's a miss!`;
+            if (landed && target.isSunk()) {
+                sunk.textContent = `${otherPlayer.name}'s ${target.name} was sunk!`;
+            } 
+        } else {
+            isWinner = true;
+            playerTurnDiv.textContent = `Game over! ${currPlayer.name} wins!`;
+        }
     }
 
     function computerAttack() {
         syncScreenAndGame();
 
-        const row = Math.floor(Math.random() * 9);
-        const col = Math.floor(Math.random() * 9);
+        let row = Math.floor(Math.random() * 8);
+        let col = Math.floor(Math.random() * 8);
 
-        console.log([row, col]);
+        while (playerTwoShots.has([row, col])) {
+            row = Math.floor(Math.random() * 8);
+            col = Math.floor(Math.random() * 8);
+        }
+
+        playerTwoShots.add(JSON.stringify([row, col]));
+
+        // console.log([row, col]);
 
         attackHandler([row, col]);
         syncScreenAndGame();
@@ -117,10 +142,21 @@ export default function screenController() {
     function singlePlayerClickHandler(e) {
         const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
         if (!Number.isNaN(coords[0]) && !Number.isNaN(coords[1])) {
+            if (playerOneShots.has(JSON.stringify(coords))) {
+                console.log("Doubles!");
+                return;
+            };
             if (isGameMode) {
+                oppBoardDiv.removeEventListener("click", singlePlayerClickHandler);
+                playerOneShots.add(JSON.stringify(coords));
+                console.log(playerOneShots);
                 attackHandler(coords);
                 renderBoard(otherPlayer.getBoard());
-                computerAttack();
+                setTimeout(() => { 
+                    sunk.textContent='';
+                    computerAttack();
+                    oppBoardDiv.addEventListener("click", singlePlayerClickHandler);
+                }, 1500);
             } else {
                 placeShipHandler(coords);
             }
@@ -132,15 +168,24 @@ export default function screenController() {
     function dualPlayerClickHandler(e) {
         const coords = [Number(e.target.dataset.row), Number(e.target.dataset.column)];
         // console.log(coords);
+        // oppBoardDiv.removeEventListener("click", dualPlayerClickHandler);
+        const currTargetHistory = game.getCurrPlayer().shotsFired;
         if (!Number.isNaN(coords[0]) && !Number.isNaN(coords[1])) {
+            if (currTargetHistory.has(JSON.stringify(coords))) return;
             if (isGameMode) {
+                oppBoardDiv.removeEventListener("click", dualPlayerClickHandler);
+                currTargetHistory.add(JSON.stringify(coords));
                 attackHandler(coords);
                 renderBoard(otherPlayer.getBoard());
-                setTimeout(() => updateScreen(), 1500);
+                setTimeout(() => {
+                    updateScreen();
+                    oppBoardDiv.addEventListener("click", dualPlayerClickHandler);
+            }, 1500);
             } else {
                 placeShipHandler(coords);
             }
         }
+        // oppBoardDiv.addEventListener("click", dualPlayerClickHandler);
     }
 
     function placeShipHandler(coords) {
@@ -157,10 +202,11 @@ export default function screenController() {
                     if(singlePlayerMode) {
                         game.getCurrPlayer().computerPlace();
                         setGameModeTrue();
+                        game.switchCurrPlayer();
                     } else {
                         nextHumanPlayerPlace();
                     }
-                    game.switchCurrPlayer();
+                    // game.switchCurrPlayer();
                     updateScreen(); 
                 }, 1000);
             } else {
@@ -178,18 +224,6 @@ export default function screenController() {
 
     /* || Contained functions are used for dual-player mode ||*/
 
-    function attackHandler(coords) {
-        const target = otherPlayer.objectAt(coords);
-        const landed = game.playRound(coords);
-        if (landed !== null) {
-            playerTurnDiv.textContent = landed ? `...It's a hit on ${otherPlayer.name}'s ${target.name}!` : `...It's a miss!`;
-            if (landed && target.isSunk()) {
-                sunk.textContent = `${otherPlayer.name}'s ${target.name} was sunk!`;
-            } 
-        } else {
-            playerTurnDiv.textContent = `Game over! ${currPlayer.name} wins!`;
-        }
-    }
     
     enemyBoard.style.display = "none";
     playerTurnDiv.textContent = `Player ${currPlayer.name}, please place your ${piece.name}.`;
