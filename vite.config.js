@@ -11,4 +11,5 @@ export default defineConfig({
     },
     target: 'esnext'
   },
+  base: "https://nicholasboyce.github.io/battleship/"
 })
